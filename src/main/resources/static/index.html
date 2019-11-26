@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Volume Detail for BTC_USDT</title>
+</head>
+<body>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.13/moment-timezone-with-data-2012-2022.min.js"></script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<div id="container" style="min-width: 310px; height: 900px; margin: 0 auto"></div>
+
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var totalVolRows = [];
+        var bidVolRows = [];
+        var askVolRows = [];
+        var priceRows = []
+        $.getJSON('http://172.30.10.216:8080/vol/page', function (data) {
+            // console.log(data)
+            var all = data.content;
+            for (var i = 0; i < all.length; i++) {
+                bidVolRows.push([all[i].id, all[i].bidTakerVolume])
+                askVolRows.push([all[i].id, all[i].askTakerVolume])
+                totalVolRows.push([all[i].id, all[i].volume])
+                priceRows.push([all[i].id, all[i].price])
+            }
+            Highcharts.chart('container', {
+                chart: {
+                    // type: 'spline'
+                    type: 'column'
+                },
+                title: {
+                    text: 'Volume Detail for trade tick'
+                },
+                subtitle: {
+                    text: 'split to buyer taker and seller taker.'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    dateTimeLabelFormats: { // don't display the dummy year
+                        // month: '%e. %b',
+                        // year: '%b'
+                        minute: '%H:%M',
+                        hour: '%H:%M',
+                        day: '%e. %b'
+                    },
+                    title: {
+                        text: 'Date'
+                    }
+                },
+                yAxis: [{
+                    title: {
+                        text: 'Trade Volume'
+                    },
+                    stackLabels: {
+                        enabled: true,
+                        formatter: function () {
+                            return this.total.toFixed(2);
+                        }
+                    },
+                    min: 0,
+                    opposite: false
+                }, {
+                    gridLineWidth: 0,
+                    title: {
+                        text: 'Price'
+                    },
+                    opposite: true
+                }],
+                tooltip: {
+                    headerFormat: '<b>{series.name}</b><br>',
+                    pointFormat: '{point.x:%e. %b}: {point.y:.2f}'
+                },
+
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+                        dataLabels: {
+                            enabled: false
+                            // formatter:'function (){return this.y:.4f}'
+                        },
+                        maxPointWidth: 30
+                    },
+                    series: {
+                        marker: {
+                            enabled: true
+                        }
+                    }
+                },
+
+                colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
+
+                series: [
+                     {
+                        yAxis: 0,
+                        name: "Sell Volume",
+                        data: askVolRows
+                    },{
+                        yAxis: 0,
+                        name: "Buy Volume",
+                        data: bidVolRows
+                    }, {
+                        yAxis: 1,
+                        type: 'spline',
+                        name: "Price",
+                        data: priceRows
+                    }
+                ],
+                time: {
+                    timezone: 'Asia/Chongqing'
+                },
+
+                responsive: {
+                    rules: [{
+                        condition: {
+                            maxWidth: 500
+                        },
+                        chartOptions: {
+                            plotOptions: {
+                                series: {
+                                    marker: {
+                                        radius: 2.5
+                                    }
+                                }
+                            }
+                        }
+                    }]
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
