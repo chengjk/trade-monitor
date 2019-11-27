@@ -25,7 +25,8 @@
         var bidVolRows = [];
         var askVolRows = [];
         var priceRows = []
-        $.getJSON('http://172.30.10.216:8080/vol/page', function (data) {
+        var buyRateRows = []
+        $.getJSON('http://localhost:8080/vol/page', function (data) {
             // console.log(data)
             var all = data.content;
             for (var i = 0; i < all.length; i++) {
@@ -33,6 +34,7 @@
                 askVolRows.push([all[i].id, all[i].askTakerVolume])
                 totalVolRows.push([all[i].id, all[i].volume])
                 priceRows.push([all[i].id, all[i].price])
+                buyRateRows.push([all[i].id, all[i].bidTakerVolume / all[i].volume])
             }
             Highcharts.chart('container', {
                 chart: {
@@ -71,11 +73,18 @@
                     min: 0,
                     opposite: false
                 }, {
-                    gridLineWidth: 0,
                     title: {
                         text: 'Price'
                     },
                     opposite: true
+                }, {
+                    title: {
+                        text: 'Buy Rate %'
+                    },
+                    opposite: false,
+                    min: 0,
+                    max: 5
+
                 }],
                 tooltip: {
                     headerFormat: '<b>{series.name}</b><br>',
@@ -101,11 +110,11 @@
                 colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
 
                 series: [
-                     {
+                    {
                         yAxis: 0,
                         name: "Sell Volume",
                         data: askVolRows
-                    },{
+                    }, {
                         yAxis: 0,
                         name: "Buy Volume",
                         data: bidVolRows
@@ -114,6 +123,12 @@
                         type: 'spline',
                         name: "Price",
                         data: priceRows
+                    },
+                    {
+                        yAxis: 2,
+                        type: 'spline',
+                        name: "Buy Rate",
+                        data: buyRateRows
                     }
                 ],
                 time: {
