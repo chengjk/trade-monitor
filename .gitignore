@@ -30,6 +30,8 @@ build/
 ### VS Code ###
 .vscode/
 
+/**/private.properties
+
 
 /.mvn
 .DS_Store
