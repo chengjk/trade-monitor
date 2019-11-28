@@ -26,6 +26,7 @@
         var askVolRows = [];
         var priceRows = []
         var buyRateRows = []
+        var netBuyRows=[]
         $.getJSON('http://localhost:8080/vol/page', function (data) {
             // console.log(data)
             var all = data.content;
@@ -35,6 +36,7 @@
                 totalVolRows.push([all[i].id, all[i].volume])
                 priceRows.push([all[i].id, all[i].price])
                 buyRateRows.push([all[i].id, all[i].bidTakerVolume / all[i].volume])
+                netBuyRows.push([all[i].id,all[i].bidTakerVolume-all[i].askTakerVolume])
             }
             Highcharts.chart('container', {
                 chart: {
@@ -83,8 +85,15 @@
                     },
                     opposite: false,
                     min: 0,
-                    max: 5
+                    max: 5,
+                    tickWidth:20
 
+
+                },{
+                    title: {
+                        text: 'Net Buy'
+                    },
+                    opposite: true,
                 }],
                 tooltip: {
                     headerFormat: '<b>{series.name}</b><br>',
@@ -107,7 +116,7 @@
                     }
                 },
 
-                colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
+                colors: ['#6CF', '#39F', '#06C', '#036'],
 
                 series: [
                     {
@@ -126,9 +135,20 @@
                     },
                     {
                         yAxis: 2,
+                        color: 'rgba(100,100,100,0.8)',
                         type: 'spline',
                         name: "Buy Rate",
                         data: buyRateRows
+                    },
+                    {
+                        yAxis: 3,
+                        color: 'rgba(248,63,63,0.3)',
+                        type: 'column',
+                        name: "Net Buy Volume",
+                        pointPadding:0.36,
+                        pointPlacement:-0.1,
+                        data: netBuyRows
+
                     }
                 ],
                 time: {
